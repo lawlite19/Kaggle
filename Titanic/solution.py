@@ -24,7 +24,7 @@ def solution_logisticRegression():
     '''训练model'''
     X = train_np[:,1:]
     y = train_np[:,0]
-    model = svm.SVC().fit(X,y)
+    model = linear_model.LogisticRegression(C=1.0).fit(X,y)
     '''测试集上预测'''
     test_data = pd.read_csv(r"data/test.csv")
     process_test_data = pre_processData(test_data,'process_test_data')  # 预处理数据
@@ -47,7 +47,8 @@ def solution_svm():
     '''训练model'''
     X = train_np[:,1:]
     y = train_np[:,0]
-    model = linear_model.LogisticRegression(C=1.0).fit(X,y)
+    model = svm.SVC(tol=1e-4).fit(X,y)
+    
     '''测试集上预测'''
     test_data = pd.read_csv(r"data/test.csv")
     process_test_data = pre_processData(test_data,'process_test_data')  # 预处理数据
