@@ -5,7 +5,6 @@ from matplotlib import pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn import linear_model
 from sklearn import svm
-from scipy import optimize
 from matplotlib.font_manager import FontProperties
 font = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=14)    # 解决windows环境下画图汉字乱码问题
 
@@ -16,15 +15,15 @@ def solution_logisticRegression():
     train_data = pd.read_csv(r"data/train.csv")
     print u"数据信息：\n",train_data.info()
     print u'数据描述：\n',train_data.describe()  
-    #display_data(train_data)  # 简单显示数据信息
-    #display_with_process(train_data) # 根据数据的理解，简单处理一下数据显示,验证猜想
+    display_data(train_data)  # 简单显示数据信息
+    display_with_process(train_data) # 根据数据的理解，简单处理一下数据显示,验证猜想
     process_data = pre_processData(train_data,'process_train_data')  # 数据预处理，要训练的数据
     train_data = process_data.filter(regex='Survived|Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')  # 使用正则抽取想要的数据
     train_np = train_data.as_matrix()  # 转为矩阵
     '''训练model'''
     X = train_np[:,1:]
     y = train_np[:,0]
-    model = linear_model.LogisticRegression(C=1.0).fit(X,y)
+    model = linear_model.LogisticRegression(C=1.0,tol=1e-6).fit(X,y)
     '''测试集上预测'''
     test_data = pd.read_csv(r"data/test.csv")
     process_test_data = pre_processData(test_data,'process_test_data')  # 预处理数据
@@ -47,7 +46,7 @@ def solution_svm():
     '''训练model'''
     X = train_np[:,1:]
     y = train_np[:,0]
-    model = svm.SVC(tol=1e-4).fit(X,y)
+    model = svm.SVC(tol=1e-6).fit(X,y)
     
     '''测试集上预测'''
     test_data = pd.read_csv(r"data/test.csv")
@@ -188,6 +187,6 @@ def display_with_process(train_data):
     
     
 if __name__ == '__main__':
-    # solution_logisticRegression()
-    solution_svm()
+    solution_logisticRegression()
+    #solution_svm()
 
