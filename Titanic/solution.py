@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.preprocessing import StandardScaler
+from sklearn.cross_validation import train_test_split
+from sklearn import cross_validation
 from sklearn import linear_model
 from sklearn import svm
 from matplotlib.font_manager import FontProperties
@@ -10,30 +12,38 @@ font = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=14)    # 解决
 
 
 
-'''逻辑回归模型'''
+# 逻辑回归模型
 def solution_logisticRegression():
     train_data = pd.read_csv(r"data/train.csv")
     print u"数据信息：\n",train_data.info()
     print u'数据描述：\n',train_data.describe()  
-    display_data(train_data)  # 简单显示数据信息
-    display_with_process(train_data) # 根据数据的理解，简单处理一下数据显示,验证猜想
+    #display_data(train_data)  # 简单显示数据信息
+    #display_with_process(train_data) # 根据数据的理解，简单处理一下数据显示,验证猜想
     process_data = pre_processData(train_data,'process_train_data')  # 数据预处理，要训练的数据
-    train_data = process_data.filter(regex='Survived|Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')  # 使用正则抽取想要的数据
+    train_data = process_data.filter(regex='Survived|Age|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')  # 使用正则抽取想要的数据
     train_np = train_data.as_matrix()  # 转为矩阵
+    
     '''训练model'''
     X = train_np[:,1:]
     y = train_np[:,0]
-    model = linear_model.LogisticRegression(C=1.0,tol=1e-6).fit(X,y)
+    X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2)
+    model = linear_model.LogisticRegression(C=1.0,tol=1e-6).fit(X_train,y_train)
+    print pd.DataFrame({"columns":list(train_data.columns)[1:],"coef_":list(model.coef_.T)})
+    prediction = model.predict(X_test)
+    print np.float32(np.sum(prediction == y_test))/np.float32(prediction.shape[0])
+    
     '''测试集上预测'''
-    test_data = pd.read_csv(r"data/test.csv")
+    '''test_data = pd.read_csv(r"data/test.csv")
     process_test_data = pre_processData(test_data,'process_test_data')  # 预处理数据
-    test_data = process_test_data.filter(regex='Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')
+    test_data = process_test_data.filter(regex='Age|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')
     test_np = test_data.as_matrix()
     predict = model.predict(test_np)
     result = pd.DataFrame(data={'PassengerId':process_test_data['PassengerId'].as_matrix(),'Survived':predict.astype(np.int32)})
-    result.to_csv(r'logisticRegression_result/prediction.csv',index=False)
+    result.to_csv(r'logisticRegression_result/prediction.csv',index=False)'''
+    #clf = linear_model.LogisticRegression(C=1.0,tol=1e-6)
+    #print cross_validation.cross_val_score(clf, X,y,cv=5)
     
-'''SVM模型''' 
+# SVM模型
 def solution_svm():
     train_data = pd.read_csv(r"data/train.csv")
     print u"数据信息：\n",train_data.info()
@@ -41,7 +51,7 @@ def solution_svm():
     #display_data(train_data)  # 简单显示数据信息
     #display_with_process(train_data) # 根据数据的理解，简单处理一下数据显示,验证猜想
     process_data = pre_processData(train_data,'process_train_data')  # 数据预处理，要训练的数据
-    train_data = process_data.filter(regex='Survived|Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')  # 使用正则抽取想要的数据
+    train_data = process_data.filter(regex='Survived|Age|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')  # 使用正则抽取想要的数据
     train_np = train_data.as_matrix()  # 转为矩阵
     '''训练model'''
     X = train_np[:,1:]
@@ -51,28 +61,80 @@ def solution_svm():
     '''测试集上预测'''
     test_data = pd.read_csv(r"data/test.csv")
     process_test_data = pre_processData(test_data,'process_test_data')  # 预处理数据
-    test_data = process_test_data.filter(regex='Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')
+    test_data = process_test_data.filter(regex='Age|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')
     test_np = test_data.as_matrix()
     predict = model.predict(test_np)
     result = pd.DataFrame(data={'PassengerId':process_test_data['PassengerId'].as_matrix(),'Survived':predict.astype(np.int32)})
     result.to_csv(r'svm_result/prediction.csv',index=False)
     
+# 逻辑回归模型优化
+def solution_logisticRegression_optimize():
+    train_data = pd.read_csv(r"data/train.csv")
+    #print u"数据信息：\n",train_data.info()
+    #print u'数据描述：\n',train_data.describe()  
+    #display_data(train_data)  # 简单显示数据信息
+    #display_with_process(train_data) # 根据数据的理解，简单处理一下数据显示,验证猜想
+    process_data = pre_processData(train_data,'process_train_data',optimize=True)  # 数据预处理，要训练的数据
+    train_data = process_data.filter(regex='Survived|Age|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')  # 使用正则抽取想要的数据
+    train_np = train_data.as_matrix()  # 转为矩阵
+    '''训练model'''
+    X = train_np[:,1:]
+    y = train_np[:,0]
+    X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2)
+    model = linear_model.LogisticRegression(C=1.0,tol=1e-6).fit(X_train,y_train)
+    print pd.DataFrame({"columns":list(train_data.columns)[1:],"coef_":list(model.coef_.T)})
+    prediction = model.predict(X_test)
+    print np.float32(np.sum(prediction == y_test))/np.float32(prediction.shape[0])    
+    
+    '''测试集上预测'''
+    '''test_data = pd.read_csv(r"data/test.csv")
+    process_test_data = pre_processData(test_data,'process_test_data',optimize=True)  # 预处理数据
+    test_data = process_test_data.filter(regex='Age|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')
+    test_np = test_data.as_matrix()
+    predict = model.predict(test_np)
+    result = pd.DataFrame(data={'PassengerId':process_test_data['PassengerId'].as_matrix(),'Survived':predict.astype(np.int32)})
+    result.to_csv(r'logisticRegression_result/prediction.csv',index=False)'''
+    #clf = linear_model.LogisticRegression(C=1.0,tol=1e-6)
+    #print cross_validation.cross_val_score(clf, X,y,cv=5)    
+    
+    
+
+# 两项映射为多项式 
+def mapFeature(X1,X2):
+    degree = 2;                     # 映射的最高次方
+    out = np.ones((X1.shape[0],1))  # 映射后的结果数组（取代X）
+    '''
+    这里以degree=2为例，映射为1,x1,x2,x1^2,x1,x2,x2^2
+    '''
+    for i in np.arange(1,degree+1): 
+        for j in range(i+1):
+            temp = X1**(i-j)*(X2**j)    #矩阵直接乘相当于matlab中的点乘.*
+            out = np.hstack((out, temp.reshape(-1,1)))
+    return out
   
-'''数据预处理'''  
-def pre_processData(train_data,file_path):
+# 数据预处理  
+def pre_processData(train_data,file_path,optimize=False):
     train_data.loc[(train_data.Age.isnull()), 'Age' ] = np.mean(train_data.Age)  # 为空的年龄补为平均年龄
-    train_data.loc[(train_data.Cabin.isnull(),'Cabin')] = 'no'    # Cabin为空的设为no
-    train_data.loc[(train_data.Cabin.notnull(),'Cabin')] = 'yes'  
+    train_data.loc[(train_data.Cabin.notnull(),'Cabin')] = 'yes' # Cabin不为空的设为yes
+    train_data.loc[(train_data.Cabin.isnull(),'Cabin')] = 'no'    
     
     '''0/1对应处理'''
     dummies_cabin = pd.get_dummies(train_data['Cabin'],prefix='Cabin')  # get_dummies返回对应的0/1格式的数据，有几类返回几列，prefix指定为Cabin
     dummies_Embarked = pd.get_dummies(train_data['Embarked'], prefix='Embarked')
     dummies_Sex = pd.get_dummies(train_data['Sex'], prefix='Sex')
     dummies_Pclass = pd.get_dummies(train_data['Pclass'],prefix='Pclass')
-    train_data = pd.concat([train_data,dummies_cabin,dummies_Embarked,dummies_Pclass,dummies_Sex], axis=1)  # 拼接dataframe,axis=1为列
-    train_data.drop(['Pclass','Name','Sex','Embarked','Cabin','Ticket'],axis=1,inplace=True)   # 删除之前没有处理的数据列
+    '''如果使用优化，就映射feature'''
+    if optimize:
+        map_data = mapFeature(dummies_Sex['Sex_female'], dummies_Pclass['Pclass_1'])
+        map_Sex_female_data = pd.DataFrame(data=map_data, columns=['Sex_female_1','Sex_female_2','Sex_female_3','Sex_female_4','Sex_female_5','Sex_female_6'])      
+        train_data = pd.concat([train_data,dummies_cabin,dummies_Embarked,dummies_Pclass,dummies_Sex,map_Sex_female_data], axis=1)  # 拼接dataframe,axis=1为列
+    else:
+        train_data = pd.concat([train_data,dummies_cabin,dummies_Embarked,dummies_Pclass,dummies_Sex], axis=1)  # 拼接dataframe,axis=1为列
+    train_data.drop(['Pclass','Name','Sex','Embarked','Cabin','Ticket','Pclass_1','Sex_female'],axis=1,inplace=True)   # 删除之前没有处理的数据列
     header_string = ','.join(train_data.columns.tolist())  # 将列名转为string，并用逗号隔开
     np.savetxt(file_path+r'/pre_processData1.csv', train_data, delimiter=',',header=header_string)  # 预处理数据保存到指定目录下    
+    
+      
     '''均值归一化处理(Age和Fare)'''
     scaler = StandardScaler()
     age_scaler = scaler.fit(train_data['Age'])
@@ -187,6 +249,9 @@ def display_with_process(train_data):
     
     
 if __name__ == '__main__':
-    solution_logisticRegression()
+    '''baseline model'''
+    #solution_logisticRegression()
     #solution_svm()
+    '''优化model'''
+    solution_logisticRegression_optimize()
 
