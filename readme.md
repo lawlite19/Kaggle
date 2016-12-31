@@ -4,7 +4,7 @@ Code for Kaggle competition problem
 ## 一、Titanic: Machine Learning from Disaster
 - 问题地址：https://www.kaggle.com/c/titanic
 - 全部代码：https://github.com/lawlite19/Kaggle/blob/master/Titanic/solution.py
-- 只是使用了逻辑回归、和SVM两个模型
+- 使用了逻辑回归、和SVM两个模型，但是，观察完数据后会发现有的feature跟最后预测的结果可能关系并不是很大，所以使用线性模型进行预测个人感觉不会有太好的结果。
 
 ### 1、分析数据
 - 使用pandas读取数据
@@ -110,7 +110,7 @@ def pre_processData(train_data,file_path):
  - 实现代码：
  ```
     process_data = pre_processData(train_data,'process_train_data')  # 数据预处理，要训练的数据
-    train_data = process_data.filter(regex='Survived|Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')  # 使用正则抽取想要的数据
+    train_data = process_data.filter(regex='Survived|Age|SibSp|Parch|Fare|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')  # 使用正则抽取想要的数据
     train_np = train_data.as_matrix()  # 转为矩阵
     '''训练model'''
     X = train_np[:,1:]
@@ -122,7 +122,7 @@ def pre_processData(train_data,file_path):
      '''测试集上预测'''
     test_data = pd.read_csv(r"data/test.csv")
     process_test_data = pre_processData(test_data,'process_test_data')  # 预处理数据
-    test_data = process_test_data.filter(regex='Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')
+    test_data = process_test_data.filter(regex='Age|SibSp|Parch|Fare|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')
     test_np = test_data.as_matrix()
     predict = model.predict(test_np)
     result = pd.DataFrame(data={'PassengerId':process_test_data['PassengerId'].as_matrix(),'Survived':predict.astype(np.int32)})
@@ -160,6 +160,7 @@ def pre_processData(train_data,file_path):
  - `Sex_female`对应系数是**正数**，呈正相关，而且值相对比较大，女性存活的机会也是比较大
  - `Sex_male`对应是**负数**，呈负相关
  - `Pclass_1`对应的系数也是**正数**，而且值相对也比较大，说明一等级的乘客存活的机会比较大
+- 所以可以尝试组合多个feature产生新的feature训练和预测。
 
 
   [1]: ./images/Titanic_01.png "Titanic_01.png"
