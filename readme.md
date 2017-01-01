@@ -140,23 +140,23 @@ def pre_processData(train_data,file_path):
 ### 5、优化-对于逻辑回归模型实验
 - 查看各项对应的系数
  - `print pd.DataFrame({"columns":list(train_data.columns)[1:],"coef_":list(model.coef_.T)})`    
- - 
-```
-                 coef_     columns
-0    [-0.495832797784]         Age
-1    [-0.296800590035]       SibSp
-2   [-0.0914948195399]       Parch
-3    [-0.351233990575]    Cabin_no
-4     [0.620989192333]   Cabin_yes
-5     [0.224186492095]  Embarked_C
-6     [0.129390954718]  Embarked_Q
-7    [-0.287396447014]  Embarked_S
-8     [0.682623666835]    Pclass_1
-9     [0.376861367334]    Pclass_2
-10   [-0.789729832411]    Pclass_3
-11     [1.46093813976]  Sex_female
-12    [-1.19118293801]    Sex_male
-```
+ - 对应数据
+    ```
+                     coef_     columns
+    0    [-0.495832797784]         Age
+    1    [-0.296800590035]       SibSp
+    2   [-0.0914948195399]       Parch
+    3    [-0.351233990575]    Cabin_no
+    4     [0.620989192333]   Cabin_yes
+    5     [0.224186492095]  Embarked_C
+    6     [0.129390954718]  Embarked_Q
+    7    [-0.287396447014]  Embarked_S
+    8     [0.682623666835]    Pclass_1
+    9     [0.376861367334]    Pclass_2
+    10   [-0.789729832411]    Pclass_3
+    11     [1.46093813976]  Sex_female
+    12    [-1.19118293801]    Sex_male
+    ```
  - `Age`对应系数是**负数**，呈负相关，说明年龄越小存活的机会越大
  - `Sex_female`对应系数是**正数**，呈正相关，而且值相对比较大，女性存活的机会也是比较大
  - `Sex_male`对应是**负数**，呈负相关
