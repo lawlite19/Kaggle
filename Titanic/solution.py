@@ -15,8 +15,8 @@ font = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=14)    # 解决
 # baseline：逻辑回归模型——0.75598
 def baseline_logisticRegression():
     train_data = pd.read_csv(r"data/train.csv")
-    print u"数据信息：\n",train_data.info()
-    print u'数据描述：\n',train_data.describe()  
+    #print u"数据信息：\n",train_data.info()
+    #print u'数据描述：\n',train_data.describe()  
     #display_data(train_data)  # 简单显示数据信息
     #display_with_process(train_data) # 根据数据的理解，简单处理一下数据显示,验证猜想
     process_data = pre_processData(train_data,'process_train_data')  # 数据预处理，要训练的数据
@@ -489,9 +489,9 @@ def selectThreshold(yval,pval):
 # 主函数
 if __name__ == '__main__':
     '''baseline model'''
-    #baseline_logisticRegression()
-    baseline_svm()
+    baseline_logisticRegression()
+    #baseline_svm()
     #baseline_randomForest()
     '''优化model'''
-    optimize_logisticRegression()
+    #optimize_logisticRegression()
 
