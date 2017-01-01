@@ -134,10 +134,10 @@ def pre_processData(train_data,file_path):
  - `predict = model.predict(test_np)`
 
 ### 4、baseline model提交结果
-- 得分：    
+- 得分，还是可以的：    
 ![baseline model result][6]
 
-### 5、优化
+### 5、优化-逻辑回归模型
 - 查看各项对应的系数
  - `print pd.DataFrame({"columns":list(train_data.columns)[1:],"coef_":list(model.coef_.T)})`
 ```
@@ -160,7 +160,7 @@ def pre_processData(train_data,file_path):
  - `Sex_female`对应系数是**正数**，呈正相关，而且值相对比较大，女性存活的机会也是比较大
  - `Sex_male`对应是**负数**，呈负相关
  - `Pclass_1`对应的系数也是**正数**，而且值相对也比较大，说明一等级的乘客存活的机会比较大
-- 所以可以尝试组合多个feature产生新的feature训练和预测。
+- 可以尝试组合多个feature产生新的feature训练和预测。
 
 
   [1]: ./images/Titanic_01.png "Titanic_01.png"
