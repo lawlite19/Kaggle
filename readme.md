@@ -137,9 +137,9 @@ def pre_processData(train_data,file_path):
 - 得分，还是可以的：    
 ![baseline model result][6]
 
-### 5、优化-逻辑回归模型
+### 5、优化-对于逻辑回归模型实验
 - 查看各项对应的系数
- - `print pd.DataFrame({"columns":list(train_data.columns)[1:],"coef_":list(model.coef_.T)})`
+- `print pd.DataFrame({"columns":list(train_data.columns)[1:],"coef_":list(model.coef_.T)})`    
 ```
                  coef_     columns
 0    [-0.495832797784]         Age
@@ -156,11 +156,13 @@ def pre_processData(train_data,file_path):
 11     [1.46093813976]  Sex_female
 12    [-1.19118293801]    Sex_male
 ```
+- 
  - `Age`对应系数是**负数**，呈负相关，说明年龄越小存活的机会越大
  - `Sex_female`对应系数是**正数**，呈正相关，而且值相对比较大，女性存活的机会也是比较大
  - `Sex_male`对应是**负数**，呈负相关
  - `Pclass_1`对应的系数也是**正数**，而且值相对也比较大，说明一等级的乘客存活的机会比较大
 - 可以尝试组合多个feature产生新的feature训练和预测。
+- 最后得分只是提高了一点点。
 
 
   [1]: ./images/Titanic_01.png "Titanic_01.png"
