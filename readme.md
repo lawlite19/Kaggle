@@ -139,8 +139,8 @@ def pre_processData(train_data,file_path):
 
 ### 5、优化-对于逻辑回归模型实验
 - 查看各项对应的系数
- - `print pd.DataFrame({"columns":list(train_data.columns)[1:],"coef_":list(model.coef_.T)})`    
- - 系数和对应列         
+ - `print pd.DataFrame({"columns":list(train_data.columns)[1:],"coef_":list(model.coef_.T)})`
+ - 数据
     ```
                      coef_     columns
     0    [-0.495832797784]         Age
