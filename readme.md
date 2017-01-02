@@ -164,6 +164,7 @@ def pre_processData(train_data,file_path):
  - `Pclass_1`对应的系数也是**正数**，而且值相对也比较大，说明一等级的乘客存活的机会比较大
 - 可以尝试组合多个feature产生新的feature训练和预测。
 - 最后得分只是提高了一点点。
+- 还有feature的挖掘还不够，比如姓名、船票都没有使用，而且年龄使用平均数填补也可能存在问题。下面载提高。
 
 
   [1]: ./images/Titanic_01.png "Titanic_01.png"
