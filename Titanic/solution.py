@@ -397,12 +397,17 @@ def display_with_process(train_data):
 '''测试——异常检测，但实际不好'''    
 def anomalyDetection():
     train_data = pd.read_csv(r"data/train.csv")
-    process_data = pre_processData(train_data,'process_train_data',optimize=False)  # 数据预处理，要训练的数据
+    process_data = pre_processData(train_data,'process_train_data')  # 数据预处理，要训练的数据
     train_data_filter = process_data.filter(regex='Survived|Age|SibSp|Parch|Fare|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')  # 使用正则抽取想要的数据
     #train_data_filter.Pclass_3.plot(kind='kde')
     #plt.show()
     data = train_data_filter.as_matrix()
-    anomaly_test_data = process_data.filter(regex='Survived|Age|SibSp|Parch|Fare')    
+    anomaly_test_data = process_data.filter(regex='Survived|Age|SibSp|Parch|Fare')  
+    other_attribute = pre_processData(train_data,'process_train_data').filter(regex='Survived|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')  
+    other_attribute_data = other_attribute.as_matrix()
+    X_other = other_attribute_data[:,1:]
+    y_other = other_attribute_data[:,0]
+    other_model = linear_model.LogisticRegression(tol=1e-6).fit(X_other,y_other)    
     X_train = data[:,1:]
     y_train = data[:,0]
     anomaly_test = anomaly_test_data.as_matrix()
@@ -424,23 +429,28 @@ def anomalyDetection():
     train_data.to_csv(r'test.csv',index=False)
     '''测试集上预测'''
     test_data = pd.read_csv(r"data/test.csv")
-    process_test_data = pre_processData(test_data,'process_test_data',optimize=False)  # 预处理数据
+    process_test_data = pre_processData(test_data,'process_test_data')  # 预处理数据
     test_data = process_test_data.filter(regex='Age|SibSp|Parch|Fare|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')
     test_np = test_data.as_matrix()
     predict = model.predict(test_np)
-    anomaly_data = process_test_data.filter(regex='Survived|Age|SibSp|Parch|Fare')    
+    anomaly_data = process_test_data.filter(regex='Age|SibSp|Parch|Fare')    
     anomaly_data_np = anomaly_data.as_matrix()
     mu,Sigma2 = estimateGaussian(anomaly_data_np)
     p = multivariateGaussian(anomaly_data_np, mu, Sigma2)
     anomaly_prediction = np.ravel(np.array(np.where(p<epsilon)))
+    
+    for i in range(len(anomaly_prediction)):
+        predict[i] = other_model.predict(test_np[anomaly_prediction[i],5:])
     #for i in range(len(anomaly_prediction)):
-    #    if predict[anomaly_prediction[i]] == 0 :
-    #        predict[anomaly_prediction[i]] = 1
-    #    else:
-    #        predict[anomaly_prediction[i]] = 0
+        #if predict[anomaly_prediction[i]] == 0 and test_np[i,0]<0 and test_np[i,-2]==1:
+            #predict[anomaly_prediction[i]] = 1
+        #elif predict[anomaly_prediction[i]] == 1 and test_np[i,0]>0 and test_np[i,-2]==0:
+            #predict[anomaly_prediction[i]] = 0
+        #else:
+            #pass
     
     result = pd.DataFrame(data={'PassengerId':process_test_data['PassengerId'].as_matrix(),'Survived':predict.astype(np.int32)})
-    result.to_csv(r'logisticRegression_result/prediction.csv',index=False)
+    result.to_csv(r'optimize_logisticRegression_result/prediction.csv',index=False)
 # 参数估计函数（就是求均值和方差）
 def estimateGaussian(X):
     m,n = X.shape
@@ -494,4 +504,6 @@ if __name__ == '__main__':
     #baseline_randomForest()
     '''优化model'''
     #optimize_logisticRegression()
+    '''调优测试'''
+    #anomalyDetection()
 
