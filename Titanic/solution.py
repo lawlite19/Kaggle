@@ -182,7 +182,7 @@ def baseline_logisticRegression_crossValidate():
     
     
 
-'''optimize: 逻辑回归模型——0.76077'''
+'''optimize: 逻辑回归模型——0.77033'''
 def optimize_logisticRegression():
     train_data = pd.read_csv(r"data/train.csv")
     print u"数据信息：\n",train_data.info()
@@ -257,7 +257,25 @@ def pre_processData(train_data,file_path):
 
 ## feature engineering：特征工程-预处理数据
 def fe_preprocessData(train_data,file_path):
-    train_data.loc[(train_data.Age.isnull()), 'Age' ] = np.mean(train_data.Age)  # 为空的年龄补为平均年龄
+    if np.sum(train_data.Fare.isnull()):  # 如果Fare中有为空的，就设为均值
+        train_data.loc[(train_data.Fare.isnull(),'Fare')]=np.mean(train_data.Fare)    
+    '''年龄数据处理'''    
+    age_train = train_data[['Age','SibSp','Parch','Fare','Pclass']]
+    scaler_fare = StandardScaler()
+    scaler_fare.fit(age_train.Fare)
+    age_train['Fare'] = scaler_fare.transform(age_train.Fare)
+    
+    known_age = age_train[age_train.Age.notnull()].as_matrix()
+    unknown_age = age_train[age_train.Age.isnull()].as_matrix()
+    X_train_age = known_age[:,1:]
+    y_train_age = known_age[:,0]
+    X_test_age = unknown_age[:,1:]
+    model = svm.SVR(C=1.0,kernel='rbf').fit(X_train_age,y_train_age)   # svm模型训练年龄
+    y_test_predict = model.predict(X_test_age)
+    train_data.loc[train_data.Age.isnull(),'Age'] = y_test_predict
+    
+    
+    #train_data.loc[(train_data.Age.isnull()), 'Age' ] = np.mean(train_data.Age)  # 为空的年龄补为平均年龄
     train_data.loc[(train_data.Cabin.notnull(),'Cabin')] = 'yes' # Cabin不为空的设为yes
     train_data.loc[(train_data.Cabin.isnull(),'Cabin')] = 'no'    
     '''0/1对应处理'''
@@ -283,8 +301,7 @@ def fe_preprocessData(train_data,file_path):
     scaler = StandardScaler()
     age_scaler = scaler.fit(train_data['Age'])
     train_data['Age'] = age_scaler.fit_transform(train_data['Age'])
-    if np.sum(train_data.Fare.isnull()):  # 如果Fare中有为空的，就设为均值
-        train_data.loc[(train_data.Fare.isnull(),'Fare')]=np.mean(train_data.Fare)
+
     fare_scaler = scaler.fit(train_data['Fare'])
     train_data['Fare'] = fare_scaler.transform(train_data['Fare'])
     header_string = ','.join(train_data.columns.tolist())  # 将列名转为string，并用逗号隔开
@@ -499,8 +516,8 @@ def selectThreshold(yval,pval):
 # 主函数
 if __name__ == '__main__':
     '''baseline model'''
-    baseline_logisticRegression()
-    #baseline_svm()
+    #baseline_logisticRegression()
+    baseline_svm()
     #baseline_randomForest()
     '''优化model'''
     #optimize_logisticRegression()
