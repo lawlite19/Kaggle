@@ -168,6 +168,13 @@ def pre_processData(train_data,file_path):
 - 还有可以继续挖掘feature，比如姓名、船票都没有使用等。
 - 这里数据量还是比较小的，使用交叉验证最后得出的效果可能并不能如愿，需要不断尝试。
 
+## 二、Digit Recognizer
+- 问题地址：https://www.kaggle.com/c/titanic
+- 全部代码：https://github.com/lawlite19/Kaggle/blob/master/Titanic/solution.py
+- 使用了逻辑回归、和SVM两个模型，但是，观察完数据后会发现有的feature跟最后预测的结果可能关系并不是很大，所以使用线性模型进行预测个人感觉不会有太好的结果
+
+
+
 
 
   [1]: ./images/Titanic_01.png "Titanic_01.png"
