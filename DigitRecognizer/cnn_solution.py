@@ -5,6 +5,16 @@ import pandas as pd
 
 
 
+'''加载数据'''
+mnist = pd.read_csv(r'data/train.csv')
+train_labels = mnist['label']
+train_images = mnist.iloc[:,1:]
+train_images.astype(np.float)
+train_images = np.multiply(train_images, 1.0/255.0)
+train_images = train_images.as_matrix()
+train_labels = train_labels.as_matrix()
+
+
 def compute_accuracy(xs,ys,X,y,keep_prob,sess,prediction):
     y_pre = sess.run(prediction,feed_dict={xs:X,keep_prob:1.0})
     correct_prediction = tf.equal(tf.argmax(y_pre,1),tf.argmax(y,1))
@@ -29,13 +39,8 @@ def max_pool_2x2(x):
                           strides=[1,2,2,1],
                           padding='SAME')#池化的核函数大小为2x2，因此ksize=[1,2,2,1]，步长为2，因此strides=[1,2,2,1]
 
-mnist = pd.read_csv(r'data/train.csv')
-train_labels = mnist['label']
-train_images = mnist.iloc[:,1:]
-train_images.astype(np.float)
-train_images = np.multiply(train_images, 1.0/255.0)
-train_images = train_images.as_matrix()
-train_labels = train_labels.as_matrix()
+
+
 
 epochs_compeleted = 0
 index_in_epoch = 0
@@ -88,13 +93,11 @@ def cnn():
     X = mnist_test.as_matrix()
     BATCH_SIZE = 100
     predictions = np.zeros(mnist_test.shape[0])
-    for i in range(mnist_test.shape[0]//BATCH_SIZE):
+    for i in range(mnist_test.shape[0]//BATCH_SIZE):   # 一批一批的预测，否则内存可能不够，这里4G
         predictions[i*BATCH_SIZE : (i+1)*BATCH_SIZE] = sess.run(predict,feed_dict={xs:X[i*BATCH_SIZE : (i+1)*BATCH_SIZE],keep_prob:1.0})
 
     result = pd.DataFrame(data={'ImageId':range(1,X.shape[0]+1),'Label':predictions.astype(np.int32)})
     result.to_csv(r'my_prediction.csv',index=False)    
-        #if i % 50 == 0:
-        #    print compute_accuracy(xs,ys,mnist.test.images, mnist.test.labels,keep_prob,sess,prediction)
     #np.savetxt('submission_softmax.csv', 
                #np.c_[range(1,len(test_images)+1),predicted_lables], 
                #delimiter=',', 
@@ -102,14 +105,16 @@ def cnn():
                #comments = '', 
                #fmt='%d')    
 
+
+'''数据的映射，例如1-->[0,1,0,0,0,0,0,0,0,0]'''
 def dense_to_one_hot(label_dense,num_classes):
     num_labels = label_dense.shape[0]
     index_offset = np.arange(num_labels)*num_classes
     labels_one_hot = np.zeros((num_labels, num_classes))
-    labels_one_hot.flat[index_offset + label_dense.ravel()] = 1
+    labels_one_hot.flat[index_offset + label_dense.ravel()] = 1  # flat展开
     return labels_one_hot    
     
-
+'''使用SGD随机梯度下降，所以指定next batch的训练集'''
 def next_batch(mnist,batch_size):
     num_examples = mnist.shape[0]
     global train_images

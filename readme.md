@@ -169,12 +169,66 @@ def pre_processData(train_data,file_path):
 - 这里数据量还是比较小的，使用交叉验证最后得出的效果可能并不能如愿，需要不断尝试。
 
 ## 二、Digit Recognizer
-- 问题地址：https://www.kaggle.com/c/titanic
-- 全部代码：https://github.com/lawlite19/Kaggle/blob/master/Titanic/solution.py
-- 使用了逻辑回归、和SVM两个模型，但是，观察完数据后会发现有的feature跟最后预测的结果可能关系并不是很大，所以使用线性模型进行预测个人感觉不会有太好的结果
+- 问题地址：https://www.kaggle.com/c/digit-recognizer
+- 全部代码：https://github.com/lawlite19/Kaggle/blob/master/DigitRecognizer/cnn_solution.py
+- 使用了CNN卷积神经网络模型
 
+### 1、卷积神经网络
+- 在深度学习里写过：https://github.com/lawlite19/DeepLearning_Python
 
+### 2、CNN实现
+- 之前在`TensorFlow`中实现过，只是这里数据需要处理一下，因为`TensorFlow`中的`mnist`数据集是处理好的
+- 这里的数据是`0-255`的，需要预处理
+```
+'''加载数据'''
+mnist = pd.read_csv(r'data/train.csv')
+train_labels = mnist['label']
+train_images = mnist.iloc[:,1:]
+train_images.astype(np.float)
+train_images = np.multiply(train_images, 1.0/255.0)
+train_images = train_images.as_matrix()
+train_labels = train_labels.as_matrix() 
+```
+- 数字的映射的实现
+```
+'''数据的映射，例如1-->[0,1,0,0,0,0,0,0,0,0]'''
+def dense_to_one_hot(label_dense,num_classes):
+    num_labels = label_dense.shape[0]
+    index_offset = np.arange(num_labels)*num_classes
+    labels_one_hot = np.zeros((num_labels, num_classes))
+    labels_one_hot.flat[index_offset + label_dense.ravel()] = 1  # flat展开
+    return labels_one_hot 
+```
+- next_batch的实现
+```
+'''使用SGD随机梯度下降，所以指定next batch的训练集'''
+def next_batch(mnist,batch_size):
+    num_examples = mnist.shape[0]
+    global train_images
+    global train_labels
+    global index_in_epoch
+    global epochs_compeleted
+    start = index_in_epoch
+    index_in_epoch += batch_size
+    if index_in_epoch > num_examples:
+        epochs_compeleted += 1
+        perm = np.arange(num_examples)
+        np.random.shuffle(perm)
+        train_images = train_images[perm]
+        train_labels = train_labels[perm]   
+        start = 0
+        index_in_epoch = batch_size
+        assert batch_size <= num_examples        
+    end = index_in_epoch
+    train_labels_one_hot = dense_to_one_hot(train_labels[start:end], num_classes=10)
+    return train_images[start:end], train_labels_one_hot
+```
 
+### 3、预测结果
+- 使用SGD，batch为100，训练1000次            
+![enter description here][7]
+- 使用SGD，batch为100，训练2000次              
+![enter description here][8]
 
 
   [1]: ./images/Titanic_01.png "Titanic_01.png"
@@ -183,3 +237,5 @@ def pre_processData(train_data,file_path):
   [4]: ./images/Titanic_04.png "Titanic_04.png"
   [5]: ./images/Titanic_05.png "Titanic_05.png"
   [6]: ./images/Titanic_06.png "Titanic_06.png"
+  [7]: ./images/DigitalRecognizer_01.png "DigitalRecognizer_01.png"
+  [8]: ./images/DigitalRecognizer_02.png "DigitalRecognizer_02.png"
