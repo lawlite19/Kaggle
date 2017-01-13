@@ -177,7 +177,7 @@ def pre_processData(train_data,file_path):
 - 在深度学习里写过：https://github.com/lawlite19/DeepLearning_Python
 
 ### 2、CNN实现
-- 之前在`TensorFlow`中实现过，只是这里数据需要处理一下，因为`TensorFlow`中的`mnist`数据集是处理好的
+- 之前在`TensorFlow`中实现过：https://github.com/lawlite19/MachineLearning_TensorFlow，只是这里数据需要处理一下，因为`TensorFlow`中的`mnist`数据集是处理好的
 - 这里的数据是`0-255`的，需要预处理
 ```
 '''加载数据'''
